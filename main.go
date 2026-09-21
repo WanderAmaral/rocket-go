@@ -237,11 +237,17 @@ func (g *GameState) Run() {
 	fmt.Println()
 	fmt.Println("==================================")
 
-	fmt.Printf(
-		"Fim de jogo, %s! Você fez %d pontos.\n",
-		g.Name,
-		g.Points,
-	)
+	if g.Points >= 10 {
+		fmt.Println("Fim de jogo")
+		fmt.Printf(
+			"Parabéns você foi aprovado, %s! Você fez %d pontos.\n",
+			g.Name,
+			g.Points,
+		)
+	}else {
+		fmt.Printf("Você foi reprovado, %s! com um total de %d pontos. \n", g.Name,g.Points)
+
+	}
 }
 
 func toInt(s string) (int, error) {
