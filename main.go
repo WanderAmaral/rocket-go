@@ -110,17 +110,16 @@ func (g *GameState) ProcessCSV(file string) {
 			continue
 		}
 
-		correctAnswer, err := toInt(record[5])
+		correctAnswer, err := toInt(record[len(record)-1])
 		if err != nil {
 			panic("Resposta correta inválida no CSV")
 		}
 
 		question := Question{
 			Text:    record[0],
-			Options: record[1:5],
+			Options: record[1 : len(record)-1],
 			Answer:  correctAnswer,
 		}
-
 		g.Questions = append(g.Questions, question)
 	}
 }
