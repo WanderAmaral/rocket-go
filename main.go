@@ -23,6 +23,18 @@ type GameState struct {
 	Questions []Question
 }
 
+type Theme struct {
+	Name string
+	File string
+}
+
+const (
+	Red    = "\033[31m"
+	Green  = "\033[32m"
+	Yellow = "\033[33m"
+	Reset  = "\033[0m"
+)
+
 func (g *GameState) Init() {
 	fmt.Println("Seja bem-vindo(a) ao quiz")
 	fmt.Println("Escreva o seu nome:")
@@ -39,8 +51,45 @@ func (g *GameState) Init() {
 	fmt.Printf("\nVamos ao jogo, %s!\n\n", g.Name)
 }
 
-func (g *GameState) ProcessCSV() {
-	f, err := os.Open("quizgo.csv")
+func (t *GameState) EscolherTema() (Theme, error) {
+
+	fmt.Printf(Red + "Escolha um tema.\n" + Reset)
+	themes := []Theme{
+		{Name: "Conhecimentos Gerais", File: "quizgo.csv"},
+		{Name: "Ciência e Tecnologia", File: "quizgo_ciencia_tecnologia.csv"},
+		{Name: "Esportes", File: "quizgo_esportes.csv"},
+	}
+
+	for index, theme := range themes {
+		fmt.Printf(Green+"%d. %s\n"+Reset, index+1, theme.Name)
+	}
+
+	reader := bufio.NewReader(os.Stdin)
+
+	opcaoTexto, err := reader.ReadString('\n')
+
+	if err != nil {
+		return Theme{}, errors.New("erro ao ler a escolha")
+	}
+
+	opcao, err := toInt(strings.TrimSpace(opcaoTexto))
+	if err != nil {
+		return Theme{}, err
+	}
+
+	if opcao < 1 || opcao > len(themes) {
+		return Theme{}, errors.New("tema inválido")
+	}
+
+	temaSelecionado := themes[opcao-1]
+
+	fmt.Printf("\nVocê escolheu o tema: %s!\n\n", temaSelecionado.Name)
+
+	return temaSelecionado, nil
+}
+
+func (g *GameState) ProcessCSV(file string) {
+	f, err := os.Open(file)
 	if err != nil {
 		panic("Erro ao abrir arquivo CSV")
 	}
@@ -108,7 +157,7 @@ func (g *GameState) Run() {
 		fmt.Println("----------------------------------")
 
 		fmt.Printf(
-			"\033[33m%d. %s\033[0m\n",
+			Yellow+"%d. %s\n"+Reset,
 			i+1,
 			question.Text,
 		)
@@ -117,7 +166,6 @@ func (g *GameState) Run() {
 			fmt.Printf("[%d] %s\n", j+1, option)
 		}
 
-		fmt.Println()
 		fmt.Println("Digite a alternativa:")
 		fmt.Println("Você tem 10 segundos!")
 
@@ -244,8 +292,8 @@ func (g *GameState) Run() {
 			g.Name,
 			g.Points,
 		)
-	}else {
-		fmt.Printf("Você foi reprovado, %s! com um total de %d pontos. \n", g.Name,g.Points)
+	} else {
+		fmt.Printf("Você foi reprovado, %s! com um total de %d pontos. \n", g.Name, g.Points)
 
 	}
 }
@@ -269,9 +317,13 @@ func main() {
 		Points: 0,
 	}
 
-	go game.ProcessCSV()
-
 	game.Init()
+	temaEscolhido, err := game.EscolherTema()
+	if err != nil {
+		panic(err)
+	}
+
+	game.ProcessCSV(temaEscolhido.File)
 
 	game.Run()
 }
