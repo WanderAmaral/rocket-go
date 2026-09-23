@@ -53,12 +53,13 @@ func (g *GameState) Init() {
 
 func (t *GameState) EscolherTema() (Theme, error) {
 
-	fmt.Printf(Red + "Escolha um tema.\n" + Reset)
 	themes := []Theme{
 		{Name: "Conhecimentos Gerais", File: "quizgo.csv"},
 		{Name: "Ciência e Tecnologia", File: "quizgo_ciencia_tecnologia.csv"},
 		{Name: "Esportes", File: "quizgo_esportes.csv"},
 	}
+
+	fmt.Printf(Red + "Escolha um tema.\n" + Reset)
 
 	for index, theme := range themes {
 		fmt.Printf(Green+"%d. %s\n"+Reset, index+1, theme.Name)
@@ -66,26 +67,31 @@ func (t *GameState) EscolherTema() (Theme, error) {
 
 	reader := bufio.NewReader(os.Stdin)
 
-	opcaoTexto, err := reader.ReadString('\n')
+	for {
+		opcaoTexto, err := reader.ReadString('\n')
 
-	if err != nil {
-		return Theme{}, errors.New("erro ao ler a escolha")
+		if err != nil {
+			return Theme{}, errors.New("erro ao ler a escolha")
+		}
+
+		opcao, err := toInt(strings.TrimSpace(opcaoTexto))
+
+		if err != nil {
+			fmt.Println("Digite apenas um número.")
+			continue
+		}
+
+		if opcao < 1 || opcao > len(themes) {
+			fmt.Println("Tema inválido. Escolha uma opção disponível.")
+			continue
+		}
+
+		temaSelecionado := themes[opcao-1]
+
+		fmt.Printf("\nVocê escolheu o tema: %s!\n\n", temaSelecionado.Name)
+
+		return temaSelecionado, nil
 	}
-
-	opcao, err := toInt(strings.TrimSpace(opcaoTexto))
-	if err != nil {
-		return Theme{}, err
-	}
-
-	if opcao < 1 || opcao > len(themes) {
-		return Theme{}, errors.New("tema inválido")
-	}
-
-	temaSelecionado := themes[opcao-1]
-
-	fmt.Printf("\nVocê escolheu o tema: %s!\n\n", temaSelecionado.Name)
-
-	return temaSelecionado, nil
 }
 
 func (g *GameState) ProcessCSV(file string) {
