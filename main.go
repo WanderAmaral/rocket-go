@@ -95,10 +95,10 @@ func (t *GameState) EscolherTema() (Theme, error) {
 	}
 }
 
-func (g *GameState) ProcessCSV(file string) {
+func (g *GameState) ProcessCSV(file string) error {
 	f, err := os.Open(file)
 	if err != nil {
-		panic("Erro ao abrir arquivo CSV")
+		return errors.New("Erro ao abrir arquivo CSV")
 	}
 
 	defer f.Close()
@@ -107,7 +107,7 @@ func (g *GameState) ProcessCSV(file string) {
 
 	records, err := reader.ReadAll()
 	if err != nil {
-		panic("Erro ao ler CSV")
+		return errors.New("Erro ao ler CSV")
 	}
 
 	for index, record := range records {
@@ -119,7 +119,7 @@ func (g *GameState) ProcessCSV(file string) {
 
 		correctAnswer, err := toInt(record[len(record)-1])
 		if err != nil {
-			panic("Resposta correta inválida no CSV")
+			return errors.New("Resposta correta inválida no CSV")
 		}
 
 		question := Question{
@@ -129,6 +129,7 @@ func (g *GameState) ProcessCSV(file string) {
 		}
 		g.Questions = append(g.Questions, question)
 	}
+	return nil
 }
 
 // Essa função fica responsável por ler o teclado
