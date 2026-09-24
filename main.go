@@ -189,7 +189,7 @@ func (g *GameState) Run() {
 		var answer int
 		answered := false
 		tempoEsgotado := false
-
+		return
 		fmt.Printf("\rTempo restante: %02d segundos ", tempoRestante)
 
 		for !answered {
@@ -349,7 +349,11 @@ func main() {
 		panic(err)
 	}
 
-	game.ProcessCSV(temaEscolhido.File)
+	err = game.ProcessCSV(temaEscolhido.File)
+
+	if err != nil {
+		panic(err)
+	}
 
 	game.Run()
 }
