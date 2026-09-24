@@ -5,6 +5,7 @@ import (
 	"encoding/csv"
 	"errors"
 	"fmt"
+	"math/rand"
 	"os"
 	"strconv"
 	"strings"
@@ -158,13 +159,23 @@ func readInput(input chan string) {
 
 func (g *GameState) Run() {
 
-	// Canal que receberá as respostas do usuário
+	if len(g.Questions) == 0 {
+		fmt.Println("Nenhuma pergunta foi carregada.")
+		return
+	}
+
 	input := make(chan string)
 
 	var wrongAnswer int
 
-	// Goroutine responsável por ler o teclado
+	g.Points = 0
+	g.CorrectAnswers = 0
+
 	go readInput(input)
+
+	rand.Shuffle(len(g.Questions), func(i, j int) {
+		g.Questions[i], g.Questions[j] = g.Questions[j], g.Questions[i]
+	})
 
 	for i, question := range g.Questions {
 
@@ -272,7 +283,7 @@ func (g *GameState) Run() {
 		fmt.Println()
 
 		if tempoEsgotado {
-
+			wrongAnswer++
 			fmt.Printf(
 				"Resposta correta: [%d] %s\n",
 				question.Answer,
@@ -325,7 +336,7 @@ func (g *GameState) Run() {
 	if total > 0 {
 		utilization := float64(g.CorrectAnswers) / float64(total) * 100
 
-		fmt.Printf(Magenta+"Aproveitamento: "+Reset+"%.1f%%\n", utilization)
+		fmt.Printf(Magenta+"Aproveitamento: "+Reset+"%.0f%%\n", utilization)
 	}
 
 }
