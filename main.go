@@ -18,9 +18,10 @@ type Question struct {
 }
 
 type GameState struct {
-	Name      string
-	Points    int
-	Questions []Question
+	Name           string
+	Points         int
+	CorrectAnswers int
+	Questions      []Question
 }
 
 type Theme struct {
@@ -153,6 +154,8 @@ func (g *GameState) Run() {
 	// Canal que receberá as respostas do usuário
 	input := make(chan string)
 
+	var wrongAnswer int
+
 	// Goroutine responsável por ler o teclado
 	go readInput(input)
 
@@ -254,6 +257,7 @@ func (g *GameState) Run() {
 			if !timer.Stop() {
 				select {
 				case <-timer.C:
+
 				default:
 				}
 			}
@@ -274,6 +278,8 @@ func (g *GameState) Run() {
 			fmt.Println("✅ Parabéns, você acertou!")
 
 			g.Points += 5
+			//rightAnswer += 1
+			g.CorrectAnswers++
 
 		} else {
 
@@ -284,6 +290,7 @@ func (g *GameState) Run() {
 				question.Answer,
 				question.Options[question.Answer-1],
 			)
+			wrongAnswer += 1
 		}
 	}
 
@@ -301,6 +308,19 @@ func (g *GameState) Run() {
 		fmt.Printf("Você foi reprovado, %s! com um total de %d pontos. \n", g.Name, g.Points)
 
 	}
+
+	total := len(g.Questions)
+
+	fmt.Printf("Quantidade de perguntas: %d\n", total)
+	fmt.Printf("Respostas corretas: %d\n", g.CorrectAnswers)
+	fmt.Printf("Respostas erradas: %d\n", wrongAnswer)
+
+	if total > 0 {
+		utilization := float64(g.CorrectAnswers) / float64(total) * 100
+
+		fmt.Printf("Aproveitamento: %.1f%%\n", utilization)
+	}
+
 }
 
 func toInt(s string) (int, error) {
