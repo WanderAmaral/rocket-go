@@ -30,10 +30,16 @@ type Theme struct {
 }
 
 const (
-	Red    = "\033[31m"
-	Green  = "\033[32m"
-	Yellow = "\033[33m"
-	Reset  = "\033[0m"
+	Red     = "\033[31m"
+	Green   = "\033[32m"
+	Yellow  = "\033[33m"
+	Orange  = "\033[38;5;208m"
+	Pink    = "\033[38;5;198m"
+	Blue    = "\033[32m"
+	Magenta = "\033[35m"
+	Reset   = "\033[0m"
+
+	Underlined = "\033[4m"
 )
 
 func (g *GameState) Init() {
@@ -189,7 +195,6 @@ func (g *GameState) Run() {
 		var answer int
 		answered := false
 		tempoEsgotado := false
-		return
 		fmt.Printf("\rTempo restante: %02d segundos ", tempoRestante)
 
 		for !answered {
@@ -301,25 +306,26 @@ func (g *GameState) Run() {
 	if g.Points >= 10 {
 		fmt.Println("Fim de jogo")
 		fmt.Printf(
-			"Parabéns você foi aprovado, %s! Você fez %d pontos.\n",
+			"Parabéns você foi "+Underlined+Green+"aprovado,"+Reset+"%s! Você fez %d pontos.\n",
 			g.Name,
 			g.Points,
 		)
 	} else {
-		fmt.Printf("Você foi reprovado, %s! com um total de %d pontos. \n", g.Name, g.Points)
+		fmt.Printf("Você foi "+Underlined+Red+"reprovado,"+Reset+"%s! com um total de %d pontos. \n", g.Name, g.Points)
 
 	}
 
 	total := len(g.Questions)
 
+	fmt.Println("----------------------------------")
 	fmt.Printf("Quantidade de perguntas: %d\n", total)
-	fmt.Printf("Respostas corretas: %d\n", g.CorrectAnswers)
-	fmt.Printf("Respostas erradas: %d\n", wrongAnswer)
+	fmt.Printf(Pink+"Respostas corretas: "+Reset+"%d\n", g.CorrectAnswers)
+	fmt.Printf(Orange+"Respostas erradas: "+Reset+"%d\n"+Reset, wrongAnswer)
 
 	if total > 0 {
 		utilization := float64(g.CorrectAnswers) / float64(total) * 100
 
-		fmt.Printf("Aproveitamento: %.1f%%\n", utilization)
+		fmt.Printf(Magenta+"Aproveitamento: "+Reset+"%.1f%%\n", utilization)
 	}
 
 }
