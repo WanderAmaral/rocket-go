@@ -176,6 +176,8 @@ func (g *GameState) Run() {
 					continue
 				}
 
+				fmt.Printf("\nAlternativa escolhida: [%d]\n", value)
+
 				answer = value
 				answered = true
 
