@@ -279,3 +279,29 @@ func (g *GameState) Run() {
 		)
 	}
 }
+
+func askAgain() bool {
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+		fmt.Println("Deseja jogar novamente?")
+		fmt.Println("Digite 's' para sim ou 'n' para não:")
+
+		input, err := reader.ReadString('\n')
+		if err != nil {
+			return false
+		}
+
+		input = strings.TrimSpace(strings.ToLower(input))
+
+		if input == "s" {
+			return true
+		}
+
+		if input == "n" {
+			return false
+		}
+
+		fmt.Println("Digite apenas 's' ou 'n'.")
+	}
+}
