@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -41,12 +42,30 @@ func (g *GameState) Init() {
 
 func (t *GameState) EscolherTema() (Theme, error) {
 
-	themes := []Theme{
-		{Name: "Conhecimentos Gerais", File: "quizgo.csv"},
-		{Name: "Ciência e Tecnologia", File: "quizgo_ciencia_tecnologia.csv"},
-		{Name: "Esportes", File: "quizgo_esportes.csv"},
+	diretorio := "./quiz" // Subsitua pelo caminho da sua pasta
+
+	entradas, err := os.ReadDir(diretorio)
+	if err != nil {
+		fmt.Printf("Erro ao ler o diretório: %v\n", err)
+		return Theme{}, err
 	}
 
+	var themes []Theme
+
+	for _, entrada := range entradas {
+		if !entrada.IsDir() && strings.ToLower(filepath.Ext(entrada.Name())) == ".csv" {
+			// Monta o caminho completo ex: "./quiz/Ciência e Tecnologia.csv"
+			caminhoCompleto := filepath.Join(diretorio, entrada.Name())
+
+			// Remove a extensão .csv do nome para exibir no menu
+			nomeTema := strings.TrimSuffix(entrada.Name(), filepath.Ext(entrada.Name()))
+
+			themes = append(themes, Theme{
+				Name: nomeTema,
+				File: caminhoCompleto, // Passa o caminho completo aqui!
+			})
+		}
+	}
 	fmt.Printf(Red + "Escolha um tema.\n" + Reset)
 
 	for index, theme := range themes {
